@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- This meta tag ensures that the website renders correctly across different device sizes, enhancing mobile responsiveness. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Link to the external CSS stylesheet. Uncomment if you wish to customize or add styling. -->
+    <link rel="stylesheet" href="styles.css">
+
+    <title>CPSC 304 Project</title>
+    <script src="scripts.js"></script>
+</head>
+
+<body>
+    <!-- ===================================================================================== -->
+    <!-- Display the current status of the database connection. 
+         !!HERE TO HELP U DEBUGGING, NOT REQUIRED IN YOUR OWN PROJECT!!
+         -->
+    <h1>CPSC 304 Restaurant Review Project</h1>
+    <h3>Database Connection Status:
+        <!-- An in-line placeholder to display connection status. -->
+        <span id="dbStatus"> </span>
+        <!-- A loading GIF, will be hided once get the status. -->
+    </h3>
+    <div id="loading-msg">Loading...</div>
+    <br>
+    <hr><br> <!-- ========================================================================= -->
+    <div class="hidden" id="hidden-container">
+        <h2>Initialize/reset database</h2>
+        <p>If this is the first time you're running this page, you MUST use reset</p>
+        <button id="reset-db-button"> reset </button> <br>
+        <!-- A placeholder to display messages related to the reset operation. -->
+        <div id="reset-db-msg"></div>
+
+        <br>
+        <hr><br> <!-- ========================================================================= -->
+
+        <!-- Projection -->
+        <section>
+            <h2 class="table-title">Projection</h2>
+            <div class="table-container">
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Choose a table, and then select attributes to project on</h3>
+                    <form id="table-select-form">
+                        <div class="form-field">
+                            <label for="select-table">Choose a Table:</label>
+                            <select id="select-table" class="tableselector" name="table">
+                            </select>
+                        </div>
+                        <button type="submit"> Select Table</button> <br>
+                    </form>
+                    <br>
+                    <div id="table-msg"></div>
+                    <form id="attribute-select-form">
+                        <h3 class="http-request-title" id="attribute-title">Choose attributes</h3>
+                        <div class="form-field" id="checkbox-attribute">
+
+                        </div>
+                        <button type="submit">Select attributes</button> <br>
+                    </form>
+                    <table id="projection-results">
+                        <thead>
+                            <tr>
+                                <!--Table head, load in dynamically based on query results.-->
+                            </tr>
+                        </thead>
+                        <tbody id="projection-results-body">
+                        </tbody>
+                    </table>
+                    <div id="table-result-msg"></div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2 class="table-title">Owner Functions</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <button class="refresh-button" id="owner-refresh-button">Refresh</button>
+                    <h3 class="http-request-title">View owners</h3>
+                    <div class="view-table-container">
+                        <table id="view-owner-table">
+                            <thead>
+                                <tr>
+                                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                    <th>SIN</th>
+                                    <th>Name</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="delete-owner-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Create new owner </h3>
+                    <form id="insert-owner-form">
+                        <input type="number" id="insert-owner-sin" placeholder="SIN" required> <br><br>
+                        <input type="text" id="insert-owner-name" placeholder="Name" maxlength="20" required> <br><br>
+
+                        <button type="submit"> create </button> <br>
+                    </form>
+                    <div id="insert-owner-msg"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================================================================== -->
+        <section>
+            <h2 class="table-title">User Functions</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Create new user</h3>
+                    <form id="insert-user-form">
+                        <div class="form-field">
+                            <label for="uid">Enter a username (3-20 chars):</label>
+                            <input type="text" id="insert-userid" placeholder="UserID" required minlength="3"
+                                maxlength="20"> <br><br>
+                        </div>
+                        <div class="form-field">
+                            <label for="username">Enter a name (3-20 chars):</label>
+                            <input type="text" id="insert-user-name" placeholder="Name" maxlength="20" minlength="3"
+                                required> <br><br>
+                        </div>
+                        <div class="form-field">
+                            <label for="city">Choose a city:</label>
+                            <select id="cities" class="cityselector" name="city" required>
+                            </select>
+                        </div>
+                        <button type="submit"> Create </button> <br>
+                    </form>
+                    <div id="insert-user-msg"></div>
+                </div>
+
+                <!-- search for user by userid -->
+                <div class="http-request-section">
+                    <div class="tabs">
+                        <button class="tab" id="tab1" onclick="openTab(event, 1)">Search by User ID</button>
+                        <button class="tab" id="tab2" onclick="openTab(event, 2)">Search by Name</button>
+                        <button class="tab" id="tab3" onclick="openTab(event, 3)">Search by City</button>
+                    </div>
+                    <div class="http-request-section search-for-user" id="search-user-1">
+                        <h3 class="http-request-title"> Search for users by UserId</h3>
+                        <form id="search-for-user-by-id-form">
+                            <div class="form-field">
+                                <label for="userid">Enter UserId below. Leave blank to get all users</label>
+                                <input type="text" id="search-by-userid" placeholder="UserId"> <br><br>
+                            </div>
+                            <button type="submit"> Search</button> <br>
+                        </form>
+                        <table id="view-user-table-1">
+                            <thead>
+                                <tr>
+                                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                    <th>UserId</th>
+                                    <th>Name</th>
+                                    <th>City</th>
+                                    <th>Province/State</th>
+                                    <th>VerificationNumber</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-user-table-1-body">
+                            </tbody>
+                        </table>
+                        <div id="search-user-msg-1"></div>
+                    </div>
+                    <!-- Search for user by name -->
+                    <div class="http-request-section search-for-user" id="search-user-2">
+                        <h3 class="http-request-title"> Search for users by Name</h3>
+                        <form id="search-for-user-by-name-form">
+                            <div class="form-field">
+                                <label for="name">Enter Name below. Leave blank to get all users</label>
+                                <input type="text" id="search-by-name" placeholder="Name"> <br><br>
+                            </div>
+                            <button type="submit"> Search</button> <br>
+                        </form>
+                        <table id="view-user-table-2">
+                            <thead>
+                                <tr>
+                                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                    <th>UserId</th>
+                                    <th>Name</th>
+                                    <th>City</th>
+                                    <th>Province/State</th>
+                                    <th>VerificationNumber</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-user-table-2-body">
+                            </tbody>
+                        </table>
+                        <div id="search-user-msg-2"></div>
+                    </div>
+                    <!-- Search for user by city -->
+                    <!-- NOTE: this query will only return UserId and name, not the full user data -->
+                    <div class="http-request-section search-for-user" id="search-user-3">
+                        <h3 class="http-request-title"> Search for users by City</h3>
+                        <form id="search-for-user-by-city-form">
+                            <div class="form-field">
+                                <label for="search-by-city">Choose a city:</label>
+                                <select id="search-by-city" class="cityselector" name="city">
+                                </select>
+                            </div>
+                            <button type="submit"> Search</button> <br>
+                        </form>
+                        <table id="view-user-table-3">
+                            <thead>
+                                <tr>
+                                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                    <th>UserId</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-user-table-3-body">
+                            </tbody>
+                        </table>
+                        <div id="search-user-msg-3"></div>
+                    </div>
+                </div>
+
+                <!-- update user -->
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Update existing user</h3>
+                    <form id="update-user-form">
+                        <div class="form-field">
+                            <label for="select user">Select user to update:</label>
+                            <select id="userlist" class="userselector" name="select user"></select>
+                        </div>
+                        <div class="form-field">
+                            <label for="Name">Enter a new name (3-20 chars):</label>
+                            <input type="text" id="update-user-name" placeholder="Name" maxlength="20" minlength="3">
+                            <br><br>
+                        </div>
+                        <div class="form-field">
+                            <label for="city">Choose a city:</label>
+                            <select id="update-city" class="cityselector" name="city">
+                            </select>
+                        </div>
+                        <button type="submit"> Update </button> <br>
+                    </form>
+                    <div id="update-user-msg"></div>
+                </div>
+
+                <!-- delete user -->
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Delete User </h3>
+                    <form id="delete-user-form">
+                        <div class="form-field">
+                            <label for="delete-user-userid">Enter UserID of user to delete (case sensitive):</label>
+                            <input type="text" id="delete-user-userid" placeholder="UserId" required> <br><br>
+                        </div>
+                        <button type="submit"> Delete </button> <br>
+                    </form>
+                    <div id="delete-user-msg"></div>
+                </div>
+            </div>
+        </section>
+        <!-- ====================================================================================================== -->
+        <!-- Given two UserIds, add the (UserId1, UserId2) tuple to Follows -->
+        <section>
+            <h2 class="table-title">FOLLOWS</h2>
+            <div class="table-container">
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Follow user</h3>
+                    <form id="follow-form">
+                        <div class="form-field">
+                            <label for="follow-id-1">Enter userid of your account (case sensitive):</label>
+                            <input type="text" id="follow-id-1" placeholder="UserID1" required> <br><br>
+                        </div>
+                        <div class="form-field">
+                            <label for="follow-id-2">Enter userid to follow (case sensitive):</label>
+                            <input type="text" id="follow-id-2" placeholder="UserId2" required> <br><br>
+                        </div>
+                        <button type="submit"> Follow </button> <br>
+                    </form>
+                    <div id="follow-msg"></div>
+                </div>
+
+                <!-- Given either one or both of UserId1 or UserId2, query the Follows table to give results based on any and/or conditions involving the two -->
+                <div class="http-request-section">
+                    <h3 class="http-request-title">View Followers and Following</h3>
+                    <p class="http-request-title">Please leave UserId1 and UserId2 blank if you want to view all entries
+                    </p>
+                    <form id="view-follow-form">
+                        <div class="form-field">
+                            <label for="view-follow-user-id-1">Enter userid of user following (UserId1) (case
+                                sensitive):</label>
+                            <input type="text" id="view-follow-user-id-1" placeholder="UserID"> <br><br>
+                        </div>
+                        <div class="form-field">
+                            <select id="update-clause" class="clauseselector" name="clause">
+                                <option value="AND" text="AND">AND</option>
+                                <option value="OR" text="OR">OR</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="view-follow-user-id-2">Enter userid of user being followed (UserId2) (case
+                                sensitive):</label>
+                            <input type="text" id="view-follow-user-id-2" placeholder="UserID"> <br><br>
+                        </div>
+                        <button type="submit"> View </button> <br>
+                    </form>
+                    <div id="view-follow-msg"></div>
+                    <table id="view-follow-table">
+                        <thead>
+                            <tr>
+                                <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                <th>UserId1</th>
+                                <th>UserId2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="view-follow-table-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Given a (UserId1, UserId2) pair, delete that tuple from Follows if it exists -->
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Delete from following list</h3>
+                    <form id="delete-from-follow-form">
+                        <div class="form-field">
+                            <label for="delete-follow-user-id1">Enter userid of your account (case sensitive):</label>
+                            <input type="text" id="delete-follow-user-id1" placeholder="UserID" required> <br><br>
+                        </div>
+                        <div class="form-field">
+                            <label for="delete-follow-user-id2">Enter userid of account to unfollow (case
+                                sensitive):</label>
+                            <input type="text" id="delete-follow-user-id2" placeholder="UserID" required> <br><br>
+                        </div>
+                        <button type="submit"> Unfollow </button> <br>
+                    </form>
+                    <div id="delete-follow-msg"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- verification user -->
+        <section>
+            <h2 class="table-title">Verified Users</h2>
+            <div class="table-container">
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Verify users</h3>
+                    <form id="verify-form">
+                        <div class="form-field">
+                            <text>Click button to give all users with 4 or more reviews verified tags</text>
+                        </div>
+                        <button type="submit"> Verify Users </button> <br>
+                    </form>
+                    <div id="verify-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <button class="refresh-button" id="verified-user-refresh-button">Refresh</button>
+                    <h3 class="http-request-title">View Verified Users</h3>
+                    <table id="view-verified-table">
+                        <thead>
+                            <tr>
+                                <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                <th>UserId</th>
+                                <th>VerificationNumber</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div id="view-verified-msg"></div>
+                </div>
+            </div>
+        </section>
+        <!-- Restaurant Functions -->
+        <section>
+            <h2 class="table-title">Restaurant Functions</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <button class="refresh-button" id="restaurant-refresh-button">Refresh</button>
+                    <h3 class="http-request-title">View restaurants</h3>
+                    <div class="view-table-container">
+                        <table id="view-restaurant-table">
+                            <thead>
+                                <tr>
+                                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                    <th>Business number</th>
+                                    <th>Name</th>
+                                    <th>Owner</th>
+                                    <th>Address</th>
+                                    <th>City</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="delete-restaurant-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Create new restaurant </h3>
+                    <form id="insert-restaurant-form">
+                        <input type="number" id="insert-restaurant-business-number" placeholder="Business number"
+                            required>
+                        <br><br>
+                        <input type="number" id="insert-restaurant-owner-sin" placeholder="Owner SIN" required> <br><br>
+                        <input type="text" id="insert-restaurant-name" placeholder="Name" maxlength="20" required>
+                        <br><br>
+                        <input type="number" id="insert-restaurant-house-number" placeholder="House number" required>
+                        <br><br>
+                        <input type="text" id="insert-restaurant-street-name" placeholder="Street name" maxlength="50"
+                            required> <br><br>
+                        <input type="text" id="insert-restaurant-postal-code" placeholder="Postal code" maxlength="7"
+                            required> <br><br>
+                        <input type="text" id="insert-restaurant-city" placeholder="City" maxlength="30" required>
+                        <br><br>
+
+                        <button type="submit"> create </button> <br>
+                    </form>
+                    <div id="insert-restaurant-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Update existing restaurant </h3>
+                    <form id="update-restaurant-form">
+                        <input type="number" id="update-restaurant-business-number" placeholder="Business number"
+                            required>
+                        <br><br>
+                        <input type="number" id="update-restaurant-owner-sin" placeholder="Owner SIN"> <br><br>
+                        <input type="text" id="update-restaurant-name" placeholder="Name" maxlength="20"> <br><br>
+                        <input type="number" id="update-restaurant-house-number" placeholder="House number">
+                        <br><br>
+                        <input type="text" id="update-restaurant-street-name" placeholder="Street name" maxlength="50">
+                        <br><br>
+                        <input type="text" id="update-restaurant-postal-code" placeholder="Postal code" maxlength="7">
+                        <br><br>
+                        <input type="text" id="update-restaurant-city" placeholder="City" maxlength="30"> <br><br>
+
+                        <button type="submit"> update </button> <br>
+                    </form>
+                    <div id="update-restaurant-msg"></div>
+                </div>
+            </div>
+        </section>
+        <!-- Menu Item Functions -->
+        <section>
+            <h2 class="table-title">Menu Item Functions</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <button class="refresh-button" id="menu-item-refresh-button">Refresh</button>
+                    <h3 class="http-request-title">View Menu Items</h3>
+                    <table id="view-menu-item-table">
+                        <thead>
+                            <tr>
+                                <!--Table head for menu items-->
+                                <th>Business Number</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table body for menu items. -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Create New Menu Item</h3>
+                    <form id="insert-item-form">
+                        <label for="insert-item-business-number">Business Number must already exist</label>
+                        <input type="number" id="insert-item-business-number" placeholder="Business Number" required>
+                        <br><br>
+                        <label for="insert-item-name">One business cannot have the menu items with the same name</label>
+                        <input type="text" id="insert-item-name" placeholder="Name" maxlength="50" required> <br><br>
+                        <label for="insert-item-type">Menu Item Type must already exist</label>
+                        <input type="text" id="insert-item-type" placeholder="Type" maxlength="20" required> <br><br>
+                        <label for="insert-item-cost">Insert cost of menu item</label>
+                        <input type="number" id="insert-item-cost" placeholder="Cost" step="0.01" required> <br><br>
+
+                        <button type="submit">Create</button> <br>
+                    </form>
+                    <div id="insert-item-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Delete Menu Item</h3>
+                    <form id="delete-item-form">
+                        <input type="number" id="delete-item-business-number" placeholder="Business Number" required>
+                        <br><br>
+                        <input type="text" id="delete-item-name" placeholder="Name" maxlength="50" required> <br><br>
+
+                        <button type="submit">Delete</button> <br>
+                    </form>
+                    <div id="delete-item-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Edit Menu Item</h3>
+                    <form id="edit-item-form">
+                        <input type="number" id="edit-item-business-number" placeholder="Business Number" required>
+                        <br><br>
+                        <input type="text" id="edit-item-name" placeholder="Name" maxlength="50" required> <br><br>
+                        <input type="number" id="edit-item-new-cost" placeholder="New Cost" required> <br><br>
+
+                        <button type="submit">Edit</button> <br>
+                    </form>
+                    <div id="edit-item-msg"></div>
+                </div>
+
+
+        </section>
+        <section>
+            <h2 class="table-title">Restaurant Review Functions</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <button class="refresh-button" id="restaurant-review-refresh-button">Refresh</button>
+                    <h3 class="http-request-title">View restaurant reviews</h3>
+                    <div>
+                        <select name="restaurant-review-search-select" id="restaurant-review-search-select" value="all">
+                            <option value="all">ALL</option>
+                            <option value="user">USER ID</option>
+                            <option value="restaurant">RESTAURANT BUSINESS NUMBER</option>
+                        </select>
+                        <input type="text" id="restaurant-review-search-input" placeholder="Search by...">
+                        <button id="restaurant-review-search-button">Search</button>
+                    </div>
+                    <h4 id="restaurant-review-metadata">
+                    </h4>
+                    <div class="view-table-container">
+                        <table id="view-restaurant-review-table">
+                            <thead>
+                                <tr>
+                                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                                    <th>Review number</th>
+                                    <th>Business Number</th>
+                                    <th>User ID</th>
+                                    <th>Ambience Rating</th>
+                                    <th>Cleanliness Rating</th>
+                                    <th>Service Rating</th>
+                                    <th>Overall Rating</th>
+                                    <th>Content</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="restaurant-review-msg"></div>
+                    <div id="delete-restaurant-review-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Create new restaurant review </h3>
+                    <form id="insert-restaurant-review-form">
+                        <input type="number" id="insert-restaurant-review-number" placeholder="Review number"
+                            required><br><br>
+                        <input type="number" id="insert-restaurant-review-business-number" placeholder="Business number"
+                            required><br><br>
+                        <input type="text" id="insert-restaurant-review-user-id" placeholder="User ID" maxlength="30"
+                            required> <br><br>
+                        <input type="number" id="insert-restaurant-review-ambience-rating" placeholder="Ambience Rating"
+                            min="0" max="5" required> <br><br>
+                        <input type="number" id="insert-restaurant-review-cleanliness-rating" min="0" max="5"
+                            placeholder="Cleanliness Rating" required> <br><br>
+                        <input type="number" id="insert-restaurant-review-service-rating" placeholder="Service Rating"
+                            min="0" max="5" required> <br><br>
+                        <input type="text" id="insert-restaurant-review-content" placeholder="Content" maxlength="4000"
+                            required> <br><br>
+
+                        <button type="submit"> create </button> <br>
+                    </form>
+                    <div id="insert-restaurant-review-msg"></div>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title"> Update existing restaurant review</h3>
+                    <form id="update-restaurant-review-form">
+                        <input type="number" id="update-restaurant-review-number" placeholder="Review number" required>
+                        <br><br>
+                        <input type="number" id="update-restaurant-review-ambience-rating" placeholder="Ambience Rating"
+                            min="0" max="5"> <br><br>
+                        <input type="number" id="update-restaurant-review-cleanliness-rating"
+                            placeholder="Cleanliness Rating" min="0" max="5"> <br><br>
+                        <input type="number" id="update-restaurant-review-service-rating" placeholder="Service Rating"
+                            min="0" max="5"> <br><br>
+                        <input type="text" id="update-restaurant-review-content" placeholder="Content" maxlength="4000">
+                        <br><br>
+                        <button type="submit"> update </button> <br>
+                    </form>
+                    <div id="update-restaurant-review-msg"></div>
+                </div>
+        </section>
+
+        <!-- Menu Item Review Functions-->
+
+        <section>
+            <h2 class="table-title">Menu Item Review Functions</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <button class="refresh-button" id="menu-item-review-refresh-button">Refresh</button>
+                    <h3 class="http-request-title">View Menu Item Reviews</h3>
+                    <table id="view-menu-item-review-table">
+                        <thead>
+                            <tr>
+                                <!--Table head for menu items.-->
+                                <th>Review Number</th>
+                                <th>Business Number</th>
+                                <th>Menu Item Name</th>
+                                <th>Presentation Rating</th>
+                                <th>Taste Rating</th>
+                                <th>Portion Size Rating</th>
+                                <th>Content</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table body for menu items. -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Create New Menu Item Review</h3>
+                    <form id="insert-mreview-form">
+                        <label for="insert-mreview-review-number">Review number cannot already exist</label>
+                        <input type="number" id="insert-mreview-review-number" placeholder="Review Number" required>
+                        <br><br>
+                        <label for="insert-mreview-business-number">Business number must already exist</label>
+                        <input type="number" id="insert-mreview-business-number" placeholder="Business Number" required>
+                        <br><br>
+                        <label for="insert-mreview-name"> Restaurant must have a menu item with this name</label>
+                        <input type="text" id="insert-mreview-name" placeholder="Menu Item Name" maxlength="20"
+                            required>
+                        <br><br>
+                        <label for="insert-mreview-presentation">Give a Presentation rating of 1, 2, 3, 4 or 5</label>
+                        <input type="number" id="insert-mreview-presentation" placeholder="Presentation Rating"
+                            required>
+                        <br><br>
+                        <label for="insert-mreview-taste">Give a Taste rating of 1, 2, 3, 4 or 5</label>
+                        <input type="number" id="insert-mreview-taste" placeholder="Taste Rating" required> <br><br>
+                        <label for="insert-mreview-portion">Give a Portion rating of 1, 2, 3, 4 or 5</label>
+                        <input type="number" id="insert-mreview-portion" placeholder="Portion Size Rating" required>
+                        <br><br>
+                        <label for="insert-mreview-content">Write your review here:</label>
+                        <input type="text" id="insert-mreview-content" placeholder="Content" maxlength="255" required>
+                        <br><br>
+                        <label for="insert-mreview-userId">UserId must already exist</label>
+                        <input type="text" id="insert-mreview-userId" placeholder="User ID" maxlength="20" required>
+                        <br><br>
+
+                        <button type="submit">Create</button> <br>
+                    </form>
+                    <div id="insert-mreview-msg"></div>
+                </div>
+
+                <div class="http-request-section">
+                    <h3 class="http-request-title">Delete Menu Item Review</h3>
+                    <form id="delete-mreview-form">
+                        <input type="number" id="delete-mreview-review-number" placeholder="Review Number" required>
+                        <br><br>
+
+                        <button type="submit">Delete</button> <br>
+                    </form>
+                    <div id="delete-mreview-msg"></div>
+                </div>
+        </section>
+
+        <section>
+            <h2 class="table-title">View Cheapest and Most Expensive Menu Items Based on Menu Item Type</h2>
+
+            <div class="table-container">
+                <div class="http-request-section">
+                    <h3 class="http-request-title">View Cheapest Menu Items by Type</h3>
+                    <form id="view-cheapest-menu-items-button">
+                        <button type="submit">Click to view cheapest menu items by type</button> <br><br>
+                    </form>
+
+                    <h3 class="http-request-title">View Most Expensive Menu Items by Type</h3>
+                    <form id="view-most-expensive-menu-items-button">
+                        <button type="submit">Click to view most expensive menu items by type</button> <br><br>
+                    </form>
+                </div>
+
+                <div class="http-request-section">
+                    <!-- Cheapest Menu Items Table -->
+                    <table id="view-cheapest-menu-items-table">
+                        <thead>
+                            <tr>
+                                <!--Table head.-->
+                                <th>Type</th>
+                                <th>Business Number</th>
+                                <th>Name</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <!-- Most Expensive Menu Items Table -->
+                    <table id="view-most-expensive-menu-items-table" style="display: none;">
+                        <thead>
+                            <tr>
+
+                                <th>Type</th>
+                                <th>Business Number</th>
+                                <th>Name</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- check boxes to select food types-->
+
+        <section>
+            <h2 class="table-title">Find Restaurants with all Selected Menu Item Types</h2>
+            <div class="http-request-section">
+                <h3 class="http-request-title">Select Menu Item Types and Click the Button
+                    to View Restaurants That Have All Selected Menu Item Types
+                </h3>
+                <div id="menu-types-container">
+                    <label><input type="checkbox" class="menu-type-checkbox" value="Pizza"> Pizza</label>
+                    <label><input type="checkbox" class="menu-type-checkbox" value="Pasta"> Pasta</label>
+                    <label><input type="checkbox" class="menu-type-checkbox" value="Burgers"> Burgers</label>
+                    <label><input type="checkbox" class="menu-type-checkbox" value="Dim Sum"> Dim Sum</label>
+                    <label><input type="checkbox" class="menu-type-checkbox" value="Sushi"> Sushi</label>
+                </div>
+
+                <button id="view-restaurants-all-types-button">View Restaurants with All Selected Types</button>
+
+                <p id="no-results-message" style="color: red;"></p>
+
+
+                <table id="view-restaurants-all-types-table">
+                    <thead>
+                        <th>Business Number</th>
+                        <th>Name</th>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </section>
+    </div>
+
+
+
+
+
+
+
+    <!-- ========================================================================= -->
+
+
+
+
+    <script src="scripts.js"></script>
+</body>
+
+</html>
